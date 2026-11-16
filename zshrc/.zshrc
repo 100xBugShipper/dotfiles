@@ -233,3 +233,5 @@ EOF
     echo "Wallpaper changed:"
     echo "$selected"
 }
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+export PATH="$HOME/Library/Application Support/bob/nvim-bin:$PATH"

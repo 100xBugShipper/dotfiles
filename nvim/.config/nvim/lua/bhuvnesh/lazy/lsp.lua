@@ -143,10 +143,9 @@ return {
 		"hrsh7th/cmp-buffer",
 		"hrsh7th/cmp-path",
 		"hrsh7th/cmp-cmdline",
-        {"hrsh7th/nvim-cmp",
-        commit = "b356f2c"},
-		"L3MON4D3/LuaSnip",
-		"saadparwaiz1/cmp_luasnip",
+        "hrsh7th/nvim-cmp",
+		-- "L3MON4D3/LuaSnip",
+		-- "saadparwaiz1/cmp_luasnip",
 		"j-hui/fidget.nvim",
 	},
 
@@ -404,6 +403,8 @@ return {
 			snippet = {
 				expand = function(args)
 					require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
+                    vim.snippet.expand(args.body)
+
 				end,
 			},
 			window = {
@@ -423,7 +424,7 @@ return {
 			sources = cmp.config.sources({
 				-- { name = "copilot", group_index = 2 },
 				{ name = "nvim_lsp" },
-				{ name = "luasnip" }, -- For luasnip users.
+				-- { name = "luasnip" }, -- For luasnip users.
 			}, {
 				{ name = "buffer" },
 			}),
