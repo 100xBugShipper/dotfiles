@@ -42,10 +42,10 @@ TERM="xterm-256color"
 # normal.family = "Fira Mono"
 # normal.family = "CommitMono Nerd Font"
 # normal.family= "DejaVuSansM Nerd Font Mono"
-normal.family= "DejaVu Sans Mono"
+# normal.family= "DejaVu Sans Mono"
 # normal.style = "Regular"
 # normal.family = "SourceCodePro Nerd Font"
-# normal.family = "JetBrains Mono"
+normal.family = "JetBrains Mono"
 # normal.family = "JetBrainsMono Nerd Font"
 size = 18
 
