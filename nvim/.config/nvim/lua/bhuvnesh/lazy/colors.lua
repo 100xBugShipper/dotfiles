@@ -24,7 +24,11 @@ function ColorMyPencils(color)
 	local hl = vim.api.nvim_get_hl(0, { name = "Directory", link = false })
 	hl.bold = true
 	vim.api.nvim_set_hl(0, "netrwDir", hl)
-
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		callback = function()
+			vim.api.nvim_set_hl(0, "SnippetTabstop", {})
+		end,
+	})
 
 	-- StatusLine = {
 	-- 	fg = "#908caa", -- subtle
