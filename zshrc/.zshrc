@@ -17,6 +17,7 @@
 # export TERM=xterm-256color
 
 export PATH=/usr/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
 export ZSH=$HOME/.oh-my-zsh
 export PATH="$HOME/.bun/bin:$PATH"
 export EDITOR=nvim
@@ -233,5 +234,3 @@ EOF
     echo "Wallpaper changed:"
     echo "$selected"
 }
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
-export PATH="$HOME/Library/Application Support/bob/nvim-bin:$PATH"

@@ -1,65 +1,124 @@
+
 #!/usr/bin/env bash
-set -e
 
-NVIM_VERSION="v0.11.5"
+set -Eeuo pipefail
 
+# Configuration
+NVIM_VERSION="${NVIM_VERSION:-v0.11.5}"
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 
-INSTALL_DIR="$HOME/.local/nvim-$NVIM_VERSION"
-BIN_DIR="$HOME/.local/bin"
+LOCAL_DIR="$HOME/.local"
+INSTALL_DIR="$LOCAL_DIR/nvim-${NVIM_VERSION}"
+BIN_DIR="$LOCAL_DIR/bin"
 BIN_LINK="$BIN_DIR/nvim"
 
-mkdir -p "$BIN_DIR"
+mkdir -p "$LOCAL_DIR" "$BIN_DIR"
 
-echo "Installing Neovim $NVIM_VERSION on $OS ($ARCH)..."
+# Temporary directory
+TMP_DIR="$(mktemp -d "$LOCAL_DIR/nvim-install.XXXXXX")"
 
-# Detect tarball
-if [[ "$OS" == "Darwin" ]]; then
-    TARBALL="nvim-macos.tar.gz"
-    EXTRACTED_DIR="nvim-macos"
-elif [[ "$OS" == "Linux" ]]; then
-    if [[ "$ARCH" == "x86_64" ]]; then
-        TARBALL="nvim-linux64.tar.gz"
-        EXTRACTED_DIR="nvim-linux64"
-    elif [[ "$ARCH" == "aarch64" ]]; then
-        TARBALL="nvim-linux-arm64.tar.gz"
-        EXTRACTED_DIR="nvim-linux-arm64"
-    else
-        echo "Unsupported architecture: $ARCH"
+cleanup() {
+    rm -rf "$TMP_DIR"
+}
+
+trap cleanup EXIT
+
+echo "Installing Neovim ${NVIM_VERSION}"
+echo "OS: $OS"
+echo "Architecture: $ARCH"
+
+# Detect platform and archive
+case "$OS" in
+    Darwin)
+        case "$ARCH" in
+            arm64)
+                TARBALL="nvim-macos-arm64.tar.gz"
+                EXTRACTED_DIR="nvim-macos-arm64"
+                ;;
+            x86_64)
+                TARBALL="nvim-macos-x86_64.tar.gz"
+                EXTRACTED_DIR="nvim-macos-x86_64"
+                ;;
+            *)
+                echo "Unsupported macOS architecture: $ARCH"
+                exit 1
+                ;;
+        esac
+        ;;
+
+    Linux)
+        case "$ARCH" in
+            x86_64)
+                TARBALL="nvim-linux-x86_64.tar.gz"
+                EXTRACTED_DIR="nvim-linux-x86_64"
+                ;;
+            aarch64|arm64)
+                TARBALL="nvim-linux-arm64.tar.gz"
+                EXTRACTED_DIR="nvim-linux-arm64"
+                ;;
+            *)
+                echo "Unsupported Linux architecture: $ARCH"
+                exit 1
+                ;;
+        esac
+        ;;
+
+    *)
+        echo "Unsupported OS: $OS"
         exit 1
-    fi
-else
-    echo "Unsupported OS: $OS"
+        ;;
+esac
+
+# Download
+DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/${TARBALL}"
+
+echo "Downloading: $DOWNLOAD_URL"
+
+curl -fL --retry 3 "$DOWNLOAD_URL" -o "$TMP_DIR/$TARBALL"
+
+# Remove macOS quarantine attribute from archive
+if [[ "$OS" == "Darwin" ]] && command -v xattr >/dev/null 2>&1; then
+    xattr -c "$TMP_DIR/$TARBALL"
+fi
+
+# Extract
+echo "Extracting archive..."
+
+tar -xzf "$TMP_DIR/$TARBALL" -C "$TMP_DIR"
+
+# Verify extracted binary
+NEW_BINARY="$TMP_DIR/$EXTRACTED_DIR/bin/nvim"
+
+if [[ ! -x "$NEW_BINARY" ]]; then
+    echo "Error: Neovim binary not found or not executable."
     exit 1
 fi
 
-# Download
-curl -LO "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/$TARBALL"
+# Replace old version only after successful extraction
+echo "Installing to $INSTALL_DIR"
 
-# Extract
-tar xzf "$TARBALL"
-
-# Remove old version if exists
 rm -rf "$INSTALL_DIR"
+mv "$TMP_DIR/$EXTRACTED_DIR" "$INSTALL_DIR"
 
-# Move
-mv "$EXTRACTED_DIR" "$INSTALL_DIR"
+# Create/update symlink
+ln -sfn "$INSTALL_DIR/bin/nvim" "$BIN_LINK"
 
-# Symlink
-ln -sf "$INSTALL_DIR/bin/nvim" "$BIN_LINK"
+# Verify installation
+echo ""
+echo "Neovim installed successfully!"
 
-# Cleanup
-rm -f "$TARBALL"
-
-echo "✅ Installed Neovim $NVIM_VERSION"
+"$BIN_LINK" --version | head -n 1
 
 # PATH check
-if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-    echo ""
-    echo "⚠️  Add this to your shell config (~/.bashrc, ~/.zshrc):"
-    echo 'export PATH="$HOME/.local/bin:$PATH"'
-fi
+case ":$PATH:" in
+    *":$BIN_DIR:"*)
+        echo "PATH is configured correctly."
+        ;;
+    *)
+        echo ""
+        echo "Add this to your ~/.zshrc or ~/.bashrc:"
+        echo "export PATH=\"$BIN_DIR:\$PATH\""
+        ;;
+esac
 
-# Verify
-"$BIN_LINK" --version | head -n 1
