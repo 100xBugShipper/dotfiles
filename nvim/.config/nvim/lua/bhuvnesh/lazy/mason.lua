@@ -34,7 +34,7 @@ return {
 				"lua_ls",
 				"rubyfmt",
 				"solargraph",
-				-- "ruff",
+				"ruff",
 				-- "jdtls",
 				-- "pylsp",
 				-- "graphql",
