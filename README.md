@@ -25,3 +25,6 @@ sudo make install
 
 # 7. Verify
 tmux -V  # tmux 3.5a
+
+# 8. Read only lazy lock file.
+If you want to update plugins, first give lazy lock file the 644 chmod

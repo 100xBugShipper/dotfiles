@@ -1,5 +1,5 @@
 function ColorMyPencils(color)
-	color = color or "rose-pine-moon"
+	-- color = color or "rose-pine-moon"
 	-- color = color or "rose-pine-main"
 	-- color = color or "vague"
 	-- color = color or "ash"
@@ -7,7 +7,7 @@ function ColorMyPencils(color)
 	-- color = color or "gruber-darker"
 	-- color = color or "sonokai"
 	-- color = color or "onedark"
-	-- color = color or "tokyonight-storm"
+	color = color or "tokyonight-storm"
 	-- color = color or "moonfly" -- good
 	-- color = color or "catppuccin-mocha"
 	-- color = color or "kanagawa"

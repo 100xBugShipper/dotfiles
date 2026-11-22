@@ -14,4 +14,5 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	spec = "bhuvnesh.lazy",
 	change_detection = { notify = false },
+    defaults = { pin = true },
 })
