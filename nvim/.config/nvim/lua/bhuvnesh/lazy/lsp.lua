@@ -436,7 +436,7 @@ return {
 
 		vim.diagnostic.config({
 			-- update_in_insert = true,
-			underline = false,
+			underline = true,
 			-- signs = {
 			-- 	severity = { min = vim.diagnostic.severity.WARN},
 			-- },
